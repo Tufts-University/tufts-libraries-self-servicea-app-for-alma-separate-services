@@ -1,0 +1,18 @@
+[Unit]
+Description=Self Service barnes-and-noble
+After=network.target
+PartOf=self-service.target
+
+[Service]
+Type=simple
+User=libraryapps
+Group=libraryapps
+WorkingDirectory=/var/www/html/self-service-app-encapsulated-v2
+EnvironmentFile=-/etc/self-service-app/self-service.env
+ExecStart=/var/www/html/self-service-app-encapsulated-v2/.venv/bin/gunicorn -c /var/www/html/self-service-app-encapsulated-v2/gunicorn/component.conf.py --bind 127.0.0.1:5011 services.barnes_and_noble.wsgi:app
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=self-service.target

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self Service Portal</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://www.library.tufts.edu/ltsWebComponentTrial/lts-branding-component/header.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="{{ url_for('static', filename='submitFormWithFetch.js') }}"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@knadh/oat/oat.min.css">
+<script src="https://unpkg.com/@knadh/oat/oat.min.js" defer></script>
+
+<script>
+async function submitFormWithFetch(event, form) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    showHourglass();
+    clearFetchMessage();
+
+    const formData = new FormData(form);
+
+    try {
+        const response = await fetch(form.action, {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin",
+            redirect: "follow"
+        });
+
+        // Handle login redirect (HTML)
+        if (response.redirected) {
+            hideHourglass();
+            window.location.href = response.url;
+            return;
+        }
+
+        if (!response.ok) {
+            const ct = (response.headers.get("content-type") || "").toLowerCase();
+            if (ct.includes("application/json")) {
+                const data = await response.json();
+                throw new Error(data.error || data.message || "Request failed");
+            }
+            const text = await response.text();
+            throw new Error(text.slice(0, 400) || "Request failed");
+        }
+
+        const filename = getFilenameFromResponse(response);
+
+        // ✅ Immediate download path
+        if (filename) {
+            const blob = await response.blob();
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showFetchMessage("Download started: " + filename, "success");
+            return;
+        }
+
+        // ✅ JSON success path (async job)
+        const ct = (response.headers.get("content-type") || "").toLowerCase();
+        if (ct.includes("application/json")) {
+            const data = await response.json();
+
+            if (data && data.status && data.job_id) {
+                showFetchMessage(
+                    "Queued (" + data.status + "). Job ID: " + data.job_id +
+                    ". Check your email for results.",
+                    "info"
+                );
+                return;
+            }
+
+            if (data && (data.message || data.status)) {
+                showFetchMessage(
+                    data.message || ("Status: " + data.status),
+                    "info"
+                );
+                return;
+            }
+
+            throw new Error(data.error || "Unexpected JSON response");
+        }
+
+        // Fallback: unexpected non-file, non-JSON
+        const text = await response.text();
+        throw new Error("Unexpected response. First 200 chars:\n" + text.slice(0, 200));
+
+    } catch (error) {
+        showFetchMessage(
+            "Error: " + (error && error.message ? error.message : String(error)),
+            "danger"
+        );
+    } finally {
+        hideHourglass();
+    }
+}
+
+function showHourglass() { $("#hourglass").show(); }
+function hideHourglass() { $("#hourglass").hide(); }
+
+function getFilenameFromResponse(response) {
+    const disposition = response.headers.get("Content-Disposition");
+    if (!disposition) return null;
+
+    const fnameStar = disposition.match(/filename\*=(?:UTF-8''|)([^;]+)/i);
+    if (fnameStar && fnameStar[1]) {
+        try { return decodeURIComponent(fnameStar[1].trim().replace(/['"]/g, "")); } catch (e) {}
+    }
+
+    const fname = disposition.match(/filename=([^;]+)/i);
+    if (fname && fname[1]) {
+        return fname[1].trim().replace(/['"]/g, "");
+    }
+
+    return null;
+}
+
+function clearFetchMessage() {
+    const el = document.getElementById("fetch-message");
+    if (!el) return;
+    el.style.display = "none";
+    el.innerHTML = "";
+    el.className = "";
+}
+
+function showFetchMessage(msg, level) {
+    const el = document.getElementById("fetch-message");
+    if (!el) {
+        alert(msg);
+        return;
+    }
+    el.className = "alert alert-" + (level || "info");
+    el.innerText = msg;
+    el.style.display = "block";
+}
+</script>
+
+<style>
+.content{
+  box-sizing:border-box;
+  width:100%;
+  min-height:520px;
+  max-height:520px;
+  overflow:auto;
+  padding:1rem;
+}
+
+.help-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:1.25rem;
+  height:1.25rem;
+  margin-left:0.5rem;
+  border:1px solid currentColor;
+  border-radius:999px;
+  text-decoration:none;
+  font-weight:600;
+  font-size:0.9rem;
+  line-height:1;
+}
+.help-icon:hover{ text-decoration:none; opacity:0.85; }
+</style>
+
+</head>
+<body>
+
+<div id="hourglass" style="display:none;">
+    <div class="spinner"></div>
+</div>
+
+<lts-header></lts-header>
+
+<div class="content">
+    <div id="fetch-message" style="display:none; margin-bottom:1rem;"></div>
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

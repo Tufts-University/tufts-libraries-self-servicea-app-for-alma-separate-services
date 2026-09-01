@@ -1,0 +1,48 @@
+{% from 'help_button.html' import render_help_button %}
+{% extends "base.html" %}
+{% block content %}
+{% if not is_component %}
+
+<h2>Upload Excel file for Barnes and Noble <a class="help-icon" href="/help#barnes-and-noble" title="Help" aria-label="Help">{{render_help_button("Barnes and Noble Help")}}</a></h2>
+
+<!-- Download Template -->
+<p>
+    <a href="{{ url_for('static', filename='BN titles.xlsx') }}"
+       class="btn btn-primary"
+       download>
+        Download Template Spreadsheet
+    </a>
+</p>
+
+<form action="/barnes_and_noble/upload" method="post" enctype="multipart/form-data" onsubmit="submitFormWithFetch(event, this)">
+    <label for="u_file" class="vhide">Choose a file to upload</label>
+    <input type="file" name="file"  id="u_file" required>
+    <input type="hidden" name="isComponent" value="false">
+    <button type="submit">Upload</button>
+</form>
+
+{% else %}
+
+<template id="barnes-and-noble-file-uploader">
+    <h2>Upload Excel file for Barnes and Noble <a class="help-icon" href="/help#barnes-and-noble" title="Barnes and Noble Help" aria-label="Barnes and Noble Help">{{render_help_button("Barnes and Noble Help")}}</a></h2>
+
+    <!-- Download Template -->
+    <p>
+        <a href="{{ url_for('static', filename='BN titles.xlsx') }}"
+           class="btn btn-primary"
+           download>
+            Download Template Spreadsheet
+        </a>
+    </p>
+ 
+    <form id="uploadForm" action="/barnes_and_noble/upload" method="post" enctype="multipart/form-data">
+        <label for="u_file" class="vhide">Choose a file to upload</label>
+        <input type="file" name="file" id="u_file" required>
+        <input type="hidden" name="isComponent" value="true">
+        <button type="submit">Upload</button>
+    </form>
+
+</template>
+
+{% endif %}
+{% endblock %}

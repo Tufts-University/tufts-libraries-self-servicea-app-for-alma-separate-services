@@ -1,0 +1,30 @@
+{% from 'help_button.html' import render_help_button %}
+{% extends "base.html" %}
+{% block content %}
+{% if not is_component %}
+    <h2>Gift Fund Bibliography <a class="help-icon" href="/help#gift-fund-bibliography" title="Gift Fund Bibliography Help" aria-label="Gift Fund Bibliography Help">{{render_help_button("Gift Fund Bibliography Help")}}</a></h2>
+    
+    
+    <form action="/gift_fund_bibliography/process" method="post" enctype="multipart/form-data" onsubmit="submitFormWithFetch(event, this)">
+        <label for="library">Library:</label>
+        <input type="text" name="library" id="library" placeholder="e.g. Tisch Library" required>
+        <label for="fiscal_year">Fiscal Year:</label>
+        <input type="text" name="fiscal_year" id="fiscal_year" placeholder="e.g. 2025" required>
+        <button type="submit">Generate Bibliography</button>
+    </form>
+{% else %}
+    <template id="gift_fund_bibliography">
+    <h2>Gift Fund Bibliography <a class="help-icon" href="/help#gift-fund-bibliography" title="Gift Fund Bibliography Help" aria-label="Gift Fund Bibliography Help">{{render_help_button("Gift Fund Bibliography Help")}}</a></h2>
+    
+    
+    <form id="uploadForm" action="/gift_fund_bibliography/process" method="post" enctype="multipart/form-data">
+        <label for="library">Library:</label>
+        <input type="text" name="library" id="library" placeholder="e.g. Tisch Library" required>
+        <input type="hidden" name="isComponent" value="true">
+        <label for="fiscal_year">Fiscal Year:</label>
+        <input type="text" name="fiscal_year" id="fiscal_year" placeholder="e.g. 2025" required>
+        <button type="submit">Generate Bibliography</button>
+    </form>
+    </template>
+{% endif %}
+{% endblock %}

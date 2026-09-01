@@ -1,0 +1,81 @@
+{% from 'help_button.html' import render_help_button %}
+{% extends "base.html" %}
+{% block content %}
+
+
+{% if is_component %} <template id="alma-analytics-sql-generator"> {% endif %}
+<h2>Alma Analytics SQL Processor <a class="help-icon" href="/help#sql-processor" title="SQL Processor Help" aria-label="SQL Processor Help">{{render_help_button("SQL Processor Help")}}</a></h2>
+
+
+
+
+
+
+<form action="{{ url_for('sql.process_sql') }}" id="uploadForm" method="post" style="display: flex; flex-direction: column; gap: 1em; align-items: flex-start; margin-top: 1em;">
+    
+    <!-- Two-column flex container -->
+    <div style="display: flex; flex-direction: row; gap: 1em; width: 100%; align-items: flex-start;">
+        
+        <!-- Left Column (SQL Inputs) -->
+        <div style="display: flex; flex-direction: column; gap: 1em;">
+            <div>
+                <label for="sql_input_1" style="font-weight: bold;">SQL Input 1:</label><br>
+                <textarea id="sql_input_1" name="sql_input_1" rows="10" cols="60" required>{{ request.form.sql_input_1 }}</textarea>
+            </div>
+            <div>
+                <label for="sql_input_2" style="font-weight: bold;">SQL Input 2:</label><br>
+                <textarea id="sql_input_2" name="sql_input_2" rows="10" cols="60" required>{{ request.form.sql_input_2 }}</textarea>
+            </div>
+        </div>
+
+        <!-- Right Column (Join Controls) -->
+        <div style="display: flex; flex-direction: column; gap: 0.5em; align-items: flex-start;">
+            <label for="join_type" style="font-weight: bold;">Join Type:</label>
+            <select id="join_type" name="join_type">
+                <option value="left" {% if request.form.join_type == 'left' %}selected{% endif %}>Left Join</option>
+                <option value="right" {% if request.form.join_type == 'right' %}selected{% endif %}>Right Join</option>
+                <option value="inner" {% if request.form.join_type == 'inner' %}selected{% endif %}>Inner Join</option>
+                <option value="outer" {% if request.form.join_type == 'outer' %}selected{% endif %}>Outer Join</option>
+            </select>
+
+            <label for="join_field_left" style="font-weight: bold; margin-top: 1em;">Join Field (Left):</label>
+            <textarea
+                id="join_field_left"
+                name="join_field_left"
+                rows="2"
+                cols="30"
+                placeholder='"Bibliographic Details"."MMS Id"'
+            >{{ request.form.join_field_left }}</textarea>
+
+            <label for="join_field_right" style="font-weight: bold;">Join Field (Right):</label>
+            <textarea
+                id="join_field_right"
+                name="join_field_right"
+                rows="2"
+                cols="30"
+                placeholder='"Physical Items"."Barcode"'
+            >{{ request.form.join_field_right }}</textarea>
+
+            <!-- ? Final aligned Process SQL button -->
+            <div style="margin-top: 1em; align-self: flex-end;">
+                <button type="submit">Process SQL</button>
+            </div>
+        </div>
+
+
+    </div>
+</form>
+
+
+
+
+
+{% if output_sql %}
+    <div id="output">
+        <h2>Output SQL:</h2>
+        <textarea id="output_sql" rows="10" cols="100" readonly>{{ output_sql }}</textarea>
+    </div>
+{% endif %}
+{% if is_component %}</template>{%endif %}
+{% endblock %}
+

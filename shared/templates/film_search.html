@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+{% if is_component %}
+
+<!-- ============================= -->
+<!-- Component (Web Component Mode) -->
+<!-- ============================= -->
+
+<template id="film-search">
+    <h2>Film Search</h2>
+    <p>Enter a film title to search film databases. Case insensitive title match.</p>
+
+    <form id="film-search-form">
+        <label for="search_target">Search Database:</label>
+        <select id="search_target" name="search_target" required>
+            <option value="all" selected>All</option>
+            <option value="swank">Swank</option>
+            <option value="kanopy">Kanopy</option>
+            <option value="criterion">Criterion</option>
+            <option value="docuseek">Docuseek</option>
+            <option value="newday">New Day</option>
+            <option value="alexander">Alexander Street Press</option>
+        </select>
+
+        <br><br>
+
+        <label for="title_shared">Film Title:</label>
+        <input type="text" id="title_shared" name="title" required>
+
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <script>
+    (function() {
+        const form = document.getElementById("film-search-form");
+        if (!form) return;
+
+        const routeMap = {
+            all: "{{ url_for('film_search.search_all') }}",
+            swank: "{{ url_for('film_search.run_search_swank') }}",
+            kanopy: "{{ url_for('film_search.run_kanopy_search') }}",
+            criterion: "{{ url_for('film_search.run_criterion_search') }}",
+            docuseek: "{{ url_for('film_search.run_docuseek_search') }}",
+            newday: "{{ url_for('film_search.run_newday_search') }}",
+            alexander: "{{ url_for('film_search.run_alexander_search') }}"
+        };
+
+        form.addEventListener("submit", function(event) {
+            const selected = document.getElementById("search_target").value;
+            form.action = routeMap[selected] || routeMap.all;
+            form.method = "POST";
+        });
+    })();
+    </script>
+</template>
+
+{% else %}
+
+<h2>Film Search</h2>
+<p>Enter a film title to search film databases. Case insensitive title match.</p>
+
+<form id="film-search-form"
+      method="POST"
+      onsubmit="setFilmSearchAction(this); submitFormWithFetch(event, this);">
+
+    <label for="search_target">Search Database:</label>
+    <select id="search_target" name="search_target" required>
+        <option value="all" selected>All</option>
+        <option value="swank">Swank</option>
+        <option value="kanopy">Kanopy</option>
+        <option value="criterion">Criterion</option>
+        <option value="docuseek">Docuseek</option>
+        <option value="newday">New Day</option>
+        <option value="alexander">Alexander Street Press</option>
+    </select>
+
+    <br><br>
+
+    <label for="title_shared">Film Title:</label>
+    <input type="text" id="title_shared" name="title" required>
+
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<script>
+function setFilmSearchAction(form) {
+    const selected = document.getElementById("search_target").value;
+
+    const routeMap = {
+        all: "{{ url_for('film_search.search_all') }}",
+        swank: "{{ url_for('film_search.run_search_swank') }}",
+        kanopy: "{{ url_for('film_search.run_kanopy_search') }}",
+        criterion: "{{ url_for('film_search.run_criterion_search') }}",
+        docuseek: "{{ url_for('film_search.run_docuseek_search') }}",
+        newday: "{{ url_for('film_search.run_newday_search') }}",
+        alexander: "{{ url_for('film_search.run_alexander_search') }}"
+    };
+
+    form.action = routeMap[selected] || routeMap.all;
+}
+</script>
+
+{% endif %}
+{% endblock %}

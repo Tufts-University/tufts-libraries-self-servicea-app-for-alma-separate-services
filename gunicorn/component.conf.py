@@ -1,0 +1,10 @@
+workers = 2
+worker_class = "gthread"
+threads = 2
+timeout = 180
+graceful_timeout = 30
+max_requests = 500
+max_requests_jitter = 50
+accesslog = "-"
+errorlog = "-"
+capture_output = True

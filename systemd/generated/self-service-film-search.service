@@ -1,0 +1,18 @@
+[Unit]
+Description=Self Service film-search
+After=network.target
+PartOf=self-service.target
+
+[Service]
+Type=simple
+User=libraryapps
+Group=libraryapps
+WorkingDirectory=/var/www/html/self-service-app-encapsulated-v2
+EnvironmentFile=-/etc/self-service-app/self-service.env
+ExecStart=/var/www/html/self-service-app-encapsulated-v2/.venv/bin/gunicorn -c /var/www/html/self-service-app-encapsulated-v2/gunicorn/film_search.conf.py --bind 127.0.0.1:5017 services.film_search.wsgi:app
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=self-service.target

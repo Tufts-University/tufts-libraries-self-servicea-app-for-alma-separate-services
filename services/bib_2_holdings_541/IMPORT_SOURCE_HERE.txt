@@ -1,0 +1,2 @@
+This directory is populated from the original app/bib_2_holdings_541 by scripts/import_original_source.py.
+After import it contains the actual business/controller source plus service_app.py and wsgi.py.
