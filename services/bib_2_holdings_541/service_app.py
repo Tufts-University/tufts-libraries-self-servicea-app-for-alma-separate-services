@@ -5,7 +5,10 @@ from . import blueprint_541
 from . import (
     bib_2_holdings_541_auth_blueprint,
 )
+from dotenv import load_dotenv
 
+
+load_dotenv()  # Load environment variables from .env file  
 def create_app():
     root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     app = Flask(

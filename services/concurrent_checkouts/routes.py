@@ -15,18 +15,22 @@ from werkzeug.utils import secure_filename
 import os
 import jwt
 from .concurrent_checkouts import ConcurrentCheckouts
+from pathlib import Path
+
 
 # Blueprint definition
 concurrent_checkouts_blueprint = Blueprint("concurrent_checkouts", __name__)
 CORS(concurrent_checkouts_blueprint)
-
+COMPONENT_DIR = Path(__file__).resolve().parent
 # Optional: Serve component.js if you have one
 @concurrent_checkouts_blueprint.route("/component.js")
 @cross_origin()
 def serve_component():
-    component_path = os.path.join(current_app.root_path, "concurrent_checkouts")
-    return send_from_directory(component_path, "component.js", mimetype="application/javascript")
-
+    return send_from_directory(
+        COMPONENT_DIR,
+        "component.js",
+        mimetype="application/javascript",
+    )
 
 # Optional: Serve component template
 @concurrent_checkouts_blueprint.route("/component-template")

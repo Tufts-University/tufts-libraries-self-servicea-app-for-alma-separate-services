@@ -30,6 +30,8 @@ def serve_component():
         "component.js",
         mimetype="application/javascript",
     )
+
+
 # Serve component-template
 @barnes_and_noble_blueprint.route('/component-template')
 @cross_origin()

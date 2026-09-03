@@ -5,7 +5,10 @@ from . import gift_fund_blueprint
 from . import (
     blueprint_auth_gift_fund_bibliography,
 )
+from dotenv import load_dotenv
 
+
+load_dotenv()  # Load environment variables from .env file  
 def create_app():
     root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     app = Flask(

@@ -2,8 +2,10 @@ import os
 from flask import Flask
 from flask_cors import CORS
 from . import film_search_blueprint
+from dotenv import load_dotenv
 
 
+load_dotenv()  # Load environment variables from .env file  
 def create_app():
     root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     app = Flask(
