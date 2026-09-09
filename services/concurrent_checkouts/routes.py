@@ -26,11 +26,9 @@ COMPONENT_DIR = Path(__file__).resolve().parent
 @concurrent_checkouts_blueprint.route("/component.js")
 @cross_origin()
 def serve_component():
-    return send_from_directory(
-        COMPONENT_DIR,
-        "component.js",
-        mimetype="application/javascript",
-    )
+
+    component_path = os.path.join(os.path.dirname(__file__))  # correct package directory
+    return send_from_directory(component_path, 'component.js', mimetype='application/javascript')
 
 # Optional: Serve component template
 @concurrent_checkouts_blueprint.route("/component-template")
@@ -46,7 +44,7 @@ def upload_file():
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
-    # is_component = request.form.get("isComponent")
+    is_component = request.form.get("isComponent")
     # if is_component == "false":
     #     # Optional login requirement if using session
     #     if "user" not in session:

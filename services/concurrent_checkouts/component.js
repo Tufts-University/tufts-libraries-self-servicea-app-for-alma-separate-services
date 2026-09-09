@@ -108,11 +108,12 @@ class ConcurrentCheckouts extends HTMLElement {
                 template.content.cloneNode(true)
             );
 
-
             await this.injectStyles();
 
-            this.injectHourglass();
+            this.rewriteHelpLinks();
 
+            this.injectHourglass();
+            this.attachHelpLinkHandler();
             this.attachEventListeners();
 
         } catch (error) {
@@ -128,6 +129,21 @@ class ConcurrentCheckouts extends HTMLElement {
     // Shared styles
     // ================================================================
 
+    rewriteHelpLinks() {
+        const base = (this.baseUrl || "").replace(/\/+$/, "");
+
+        this.shadowRoot
+            .querySelectorAll('img[src^="/"]')
+            .forEach((img) => {
+                img.src = `${base}${img.getAttribute("src")}`;
+            });
+
+        this.shadowRoot
+            .querySelectorAll('a[href^="/"]')
+            .forEach((link) => {
+                link.href = `${base}${link.getAttribute("href")}`;
+            });
+    }
     async injectStyles() {
         try {
             const cssUrl =
@@ -278,6 +294,19 @@ class ConcurrentCheckouts extends HTMLElement {
     }
 
 
+    attachHelpLinkHandler() {
+        const base = (this.baseUrl || "").replace(/\/+$/, "");
+
+        // 1) Rewrite help icon image src to absolute Flask URL
+        this.shadowRoot.querySelectorAll("img.help-icon[src]").forEach(img => {
+            const src = img.getAttribute("src") || "";
+
+            // Only rewrite root-relative URLs
+            if (src.startsWith("/")) {
+            img.setAttribute("src", `${base}${src}`);
+            }
+        });
+    }
     async handleFormSubmit(event) {
         event.preventDefault();
 

@@ -1,10 +1,19 @@
 class SQLGenerator extends HTMLElement {
   constructor() {
-    super();
-    this.attachShadow({ mode: "open" });
+      super();
 
-    const scriptUrl = document.currentScript?.src || "";
-    this.baseUrl = scriptUrl.replace(/\/component\.js.*$/, "");
+      this.attachShadow({ mode: "open" });
+
+      const scriptUrl = document.currentScript?.src || "";
+
+      this.componentBaseUrl = scriptUrl.replace(
+          /\/component\.js.*$/,
+          ""
+      );
+
+      this.baseUrl = new URL(
+          scriptUrl
+      ).origin;
   }
 
   async connectedCallback() {
@@ -12,7 +21,9 @@ class SQLGenerator extends HTMLElement {
   }
 
   async loadTemplate() {
-    const response = await fetch(`${this.baseUrl}/component-template`);
+    const response = await fetch(
+    `${this.componentBaseUrl}/component-template`
+);
     const html = await response.text();
 
     const doc = new DOMParser().parseFromString(html, "text/html");
@@ -50,6 +61,7 @@ class SQLGenerator extends HTMLElement {
 
     this.rewriteHelpLinks();
     this.attachSubmitHandler();
+    this.attachHelpLinkHandler();
   }
 
   rewriteHelpLinks() {
@@ -80,10 +92,13 @@ class SQLGenerator extends HTMLElement {
       try {
         const formData = new FormData(form);
 
-        const response = await fetch(`${this.baseUrl}/process_sql`, {
-          method: "POST",
-          body: formData
-        });
+      const response = await fetch(
+          `${this.componentBaseUrl}/process_sql`,
+          {
+              method: "POST",
+              body: formData
+          }
+      );
 
         if (!response.ok) {
           throw new Error(`Server returned ${response.status}`);
@@ -102,6 +117,19 @@ class SQLGenerator extends HTMLElement {
     });
   }
 
+  attachHelpLinkHandler() {
+  const base = (this.baseUrl || "").replace(/\/+$/, "");
+
+  // 1) Rewrite help icon image src to absolute Flask URL
+  this.shadowRoot.querySelectorAll("img.help-icon[src]").forEach(img => {
+    const src = img.getAttribute("src") || "";
+
+    // Only rewrite root-relative URLs
+    if (src.startsWith("/")) {
+      img.setAttribute("src", `${base}${src}`);
+    }
+  });
+}
   clearOutput() {
     this.shadowRoot.querySelector("#output")?.remove();
     this.shadowRoot.querySelector(".error")?.remove();

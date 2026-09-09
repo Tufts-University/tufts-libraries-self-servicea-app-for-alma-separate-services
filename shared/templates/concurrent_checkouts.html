@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
+{% from 'help_button.html' import render_help_button %}
 
 <h2 style="color:blue">ALMA PROD</h2>
 <h2>Concurrent Checkouts <a class="help-icon" href="/help#concurrent-checkouts" title="Concurrent Checkouts Help" aria-label="Concurrent Checkouts Help">{{render_help_button("Concurrent Checkouts Help")}}</a></h2>
 
 
+{% if not is_component %}
 
-<!-- Template Download -->
 <p>
     <a href="{{ url_for('static', filename='Tisch Laptops - Concurrent Checkouts.xlsx') }}"
        class="btn btn-primary"
@@ -16,9 +17,29 @@
 </p>
 
 <!-- Upload Form -->
-<form action="/concurrent_checkouts/upload" name="fileUpload" method="post" enctype="multipart/form-data" onsubmit="submitFormWithFetch(event, this); return false;">
+<form id="uploadForm" action="/concurrent_checkouts/upload" name="uploadForm" method="post" enctype="multipart/form-data" onsubmit="submitFormWithFetch(event, this); return false;">
     <input type="file" name="file" required>
     <button type="submit">Upload</button>
+    <input type="hidden" name="isComponent" value="false">
 </form>
+{% else %}
+<template id="concurrent-checkouts">
+    <h2>Concurrent Checkouts <a class="help-icon" href="/help#concurrent-checkouts" title="Concurrent Checkouts Help" aria-label="Concurrent Checkouts Help">{{render_help_button("Concurrent Checkouts Help")}}</a></h2>
 
+<p>
+    <a href="{{ url_for('static', filename='Tisch Laptops - Concurrent Checkouts.xlsx') }}"
+       class="btn btn-primary"
+       download>
+        Download Template Spreadsheet
+    </a>
+</p>
+
+<!-- Upload Form -->
+<form id="uploadForm" action="/concurrent_checkouts/upload" name="uploadForm" method="post" enctype="multipart/form-data" onsubmit="submitFormWithFetch(event, this); return false;">
+    <input type="file" name="file" required>
+    <button type="submit">Upload</button>
+    <input type="hidden" name="isComponent" value="true">
+</form>
+</template>
+{% endif %}
 {% endblock %}
