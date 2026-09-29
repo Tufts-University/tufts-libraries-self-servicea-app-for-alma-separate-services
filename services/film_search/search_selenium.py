@@ -255,20 +255,20 @@ class SearchKanopy:
     # SEARCH
     # -------------------------------------------------------------
     def return_page_source(self, link: str):
-
         driver = self.create_driver()
-        wait = WebDriverWait(driver, 20)
 
         try:
             driver.get(link)
 
-            page_source = driver.page_source
+            # Replace this with a selector present on the page you need.
+            WebDriverWait(driver, 30).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "main"))
+            )
 
-            return page_source
+            return driver.find_element(By.TAG_NAME, "body").get_attribute("outerHTML")
         except Exception as e:
             self.log(f"Error in return_html: {e}")
             return None
-
         finally:
             driver.quit()
     def load_search_results(self, driver, wait):

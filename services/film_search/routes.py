@@ -39,6 +39,7 @@ def serve_component_template():
     return render_template("film_search.html", is_component=True)
 
 
+# search all film databases
 @film_search_blueprint.route("/search_all", methods=["GET","POST"])
 def search_all():
 
@@ -153,7 +154,7 @@ def search_all():
 )    
 
 
-
+# search just swank
 @film_search_blueprint.route("/run_search_swank", methods=["POST"])
 def run_search_swank():
     """Run Swank search and return Excel."""
@@ -178,6 +179,7 @@ def run_search_swank():
         download_name=filename,
     )
 
+# search just kanopy
 @film_search_blueprint.route("/kanopy_search", methods=["POST"])    
 def run_kanopy_search():    
     title = (request.form.get("title") or "").strip()
@@ -195,6 +197,8 @@ def run_kanopy_search():
         as_attachment=True,
         download_name=filename,
     ) 
+
+# return raw HTML, for experiment with AI agents and tools
 @film_search_blueprint.route("/return_html", methods=["GET"]) 
 def return_html():
 
@@ -210,7 +214,7 @@ def return_html():
     return page_source
     
 
-         
+# search just criterion
 @film_search_blueprint.route("/criterion_search", methods=["POST"])
 def run_criterion_search():
     """Run Criterion search and return its own Excel."""
@@ -253,7 +257,7 @@ def run_criterion_search():
 
 
 
-
+# search just docuseek
 @film_search_blueprint.route("/run_docuseek_search", methods=["POST"])
 def run_docuseek_search():
     title = request.form.get("title")
@@ -272,7 +276,7 @@ def run_docuseek_search():
     )
 
 
-
+# search just newday
 @film_search_blueprint.route("/run_newday_search", methods=["POST"])
 def run_newday_search():
     title = request.form.get("title")
@@ -292,7 +296,7 @@ def run_newday_search():
 
 from services.film_search.scrapers.ambrose_scraper import AmbroseScraper
 
-
+# search just ambrose
 @film_search_blueprint.route("/run_ambrose_search", methods=["POST"])
 def run_ambrose_search():
     title = request.form.get("title")
@@ -309,7 +313,7 @@ def run_ambrose_search():
         download_name=filename,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
-
+# search just alexander street press
 @film_search_blueprint.route("/run_alexander_search", methods=["POST"])
 def run_alexander_search():
     title = request.form.get("title")

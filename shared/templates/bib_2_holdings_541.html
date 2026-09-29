@@ -3,7 +3,7 @@
 {% block content %}
 {% if not is_component %}
 <div id="fetch-message" style="display:none; margin-bottom: 1rem;"></div>
-<h1 style="color:red">ALMA SANDBOX</h1>
+<h1 id="alma-environment-heading" style="color:red">ALMA SANDBOX</h1>
 <h2 style="margin-top: 0;">Bib → Holdings 541</h2>
 
 <form
@@ -14,6 +14,19 @@
   onsubmit="submitFormWithFetch(event, this)"
 >
   <input type="hidden" name="isComponent" value="{{ 'true' if is_component else 'false' }}">
+
+  <div class="form-group" style="margin-bottom: 1rem;">
+    <label for="environment" style="display:block; font-weight:600;">Alma environment</label>
+    <select
+      id="environment"
+      name="environment"
+      required
+      onchange="const h=this.getRootNode().getElementById('alma-environment-heading'); h.textContent=this.value === 'prod' ? 'ALMA PROD' : 'ALMA SANDBOX'; h.style.color=this.value === 'prod' ? 'blue' : 'red';"
+    >
+      <option value="sandbox" selected>Sandbox</option>
+      <option value="prod">Production</option>
+    </select>
+  </div>
 
   <div class="form-group" style="margin-bottom: 1rem;">
     <label for="file" style="display:block; font-weight:600;">Input file</label>
@@ -39,17 +52,30 @@
 {% else %}
 <template id="bib-2-holdings-541">
 <div id="fetch-message" style="display:none; margin-bottom: 1rem;"></div>
-<h1 style="color:blue">ALMA PROD</h1>
+<h1 id="alma-environment-heading" style="color:red">ALMA SANDBOX</h1>
 <h2 style="margin-top: 0;">Bib → Holdings 541</h2>
 
 <form
   id="uploadForm"
-  action="/bib_2_holdings_541/upload" 
-  method="post" 
+  action="/bib_2_holdings_541/upload"
+  method="post"
   enctype="multipart/form-data"
-  
 >
-<input type="hidden" name="isComponent" value="true">
+  <input type="hidden" name="isComponent" value="true">
+
+  <div class="form-group" style="margin-bottom: 1rem;">
+    <label for="environment" style="display:block; font-weight:600;">Alma environment</label>
+    <select
+      id="environment"
+      name="environment"
+      required
+      onchange="const h=this.getRootNode().getElementById('alma-environment-heading'); h.textContent=this.value === 'prod' ? 'ALMA PROD' : 'ALMA SANDBOX'; h.style.color=this.value === 'prod' ? 'blue' : 'red';"
+    >
+      <option value="sandbox" selected>Sandbox</option>
+      <option value="prod">Production</option>
+    </select>
+  </div>
+
   <div class="form-group" style="margin-bottom: 1rem;">
     <label for="file" style="display:block; font-weight:600;">Input file</label>
     <input id="file" name="file" type="file" required>

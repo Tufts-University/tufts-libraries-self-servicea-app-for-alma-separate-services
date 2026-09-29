@@ -12,12 +12,14 @@ from flask import (
     jsonify,
 )
 from werkzeug.utils import secure_filename
-from flask_cors import cross_origin
+from flask_cors import cross_origin, CORS
 
 import os
 import uuid
 from redis import Redis
 from rq import Queue
+from pathlib import Path
+
 
 from .auth_bib_2_holdings_541 import verify_token_or_reject
 from .tasks import run_bib2holdings541_job
@@ -70,12 +72,13 @@ def require_auth_or_reject():
 # ----------------------------------------------------------------------
 # Static assets for web component
 # ----------------------------------------------------------------------
-
+CORS(blueprint_541)
+COMPONENT_DIR = Path(__file__).resolve().parent
 @blueprint_541.route("/component.js")
-@cross_origin()
 def serve_component():
-    component_path = os.path.join(current_app.root_path, "bib_2_holdings_541")
-    return send_from_directory(component_path, "component.js", mimetype="application/javascript")
+
+    component_path = os.path.join(os.path.dirname(__file__))  # correct package directory
+    return send_from_directory(component_path, 'component.js', mimetype='application/javascript')
 
 
 @blueprint_541.route("/component-template")
