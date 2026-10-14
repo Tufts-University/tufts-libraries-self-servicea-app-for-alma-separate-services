@@ -5,8 +5,17 @@
 {% if not is_component %}
 <div id="fetch-message" style="display:none; margin-bottom: 1rem;"></div>
 <h1 id="alma-environment-heading" style="color:red">ALMA SANDBOX</h1>
-<h2 style="margin-top: 0;">Bib → Holdings 541 <a class="help-button" href="javascript:void(0);" onclick="showHelp('bib_2_holdings_541')">?</a></h2>
-
+<h2 style="margin-top: 0;">
+  Bib → Holdings 541
+  <a class="help-icon"
+     href="/help#bib-2-holdings-541"
+     target="_blank"
+     rel="noopener noreferrer"
+     title="Bib 2 Holdings Help"
+     aria-label="Bib 2 Holdings Help">
+    {{ render_help_button("Bib 2 Holdings Help") }}
+  </a>
+</h2>
 <form
   id="bib2holdings541-form"
   method="POST"
@@ -55,8 +64,17 @@
 <div id="fetch-message" style="display:none; margin-bottom: 1rem;"></div>
 
 <h1 id="alma-environment-heading" style="color:red">ALMA SANDBOX</h1>
-<h2 style="margin-top: 0;">Bib → Holdings 541 <a class="help-button" href="javascript:void(0);" onclick="showHelp('bib_2_holdings_541')">?</a></h2>
-<h2>Upload Excel file for Barnes and Noble <a class="help-icon" href="/help#bib_2_holdings_541" title="Bib 2 Holdings Help" aria-label="Bib 2 Holdings Help">{{render_help_button("Bib 2 Holdings Help")}}</a></h2>
+<h2 style="margin-top: 0;">
+  Bib → Holdings 541
+  <a class="help-icon"
+     href="/help#bib-2-holdings-541"
+     target="_blank"
+     rel="noopener noreferrer"
+     title="Bib 2 Holdings Help"
+     aria-label="Bib 2 Holdings Help">
+    {{ render_help_button("Bib 2 Holdings Help") }}
+  </a>
+</h2>
 <form
   id="uploadForm"
   action="/bib_2_holdings_541/upload"
