@@ -1,0 +1,17 @@
+[Unit]
+Description=Self Service Gateway
+After=network.target
+PartOf=self-service.target
+
+[Service]
+Type=simple
+User=libraryapps
+Group=libraryapps
+WorkingDirectory=/var/www/html/self-service-app-encapsulated-v2
+EnvironmentFile=-/etc/self-service-app/self-service.env
+ExecStart=/opt/self-service-app-venv/bin/gunicorn -c /var/www/html/self-service-app-encapsulated-v2/gunicorn/gateway.conf.py --bind 0.0.0.0:5002 gateway_wsgi:app
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=self-service.target

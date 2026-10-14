@@ -16,6 +16,14 @@ import io
 from flask_cors import CORS, cross_origin
 import os
 import json
+from flask_cors import CORS, cross_origin
+from pathlib import Path
+# Blueprint definition
+film_search_blueprint = Blueprint("film_search", __name__)
+CORS(film_search_blueprint)
+COMPONENT_DIR = Path(__file__).resolve().parent
+# Optional: Serve component.js if you have one
+
 @film_search_blueprint.route("/", methods=["GET"])
 def index():
     is_component = request.args.get("is_component", "false").lower() == "true"
@@ -26,10 +34,11 @@ def index():
 @film_search_blueprint.route('/component.js')
 @cross_origin()
 def serve_component():
-
-    component_path = os.path.join(current_app.root_path, 'film_search')
-    return send_from_directory(component_path, 'component.js', mimetype='application/javascript')
-
+    return send_from_directory(
+        os.path.dirname(os.path.abspath(__file__)),
+        'component.js',
+        mimetype='application/javascript',
+    )
 # Serve component-template
 @film_search_blueprint.route('/component-template')
 @cross_origin()

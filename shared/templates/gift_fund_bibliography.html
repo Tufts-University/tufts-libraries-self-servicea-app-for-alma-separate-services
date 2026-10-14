@@ -6,6 +6,7 @@
     
     
     <form action="/gift_fund_bibliography/process" method="post" enctype="multipart/form-data" onsubmit="submitFormWithFetch(event, this)">
+        <input type="hidden" name="isComponent" value="false">
         <label for="library">Library:</label>
         <input type="text" name="library" id="library" placeholder="e.g. Tisch Library" required>
         <label for="fiscal_year">Fiscal Year:</label>

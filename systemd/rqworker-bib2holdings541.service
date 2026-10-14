@@ -1,0 +1,23 @@
+# /etc/systemd/system/rqworker-bib2holdings541.service
+[Unit]
+Description=RQ Worker (bib2holdings541)
+After=network.target 
+Requires=redis.service
+
+[Service]
+Type=simple
+User=libraryapps
+Group=libraryapps
+
+WorkingDirectory=/var/www/html/self-service-app-encapsulated-v2
+
+Environment="REDIS_URL=redis://127.0.0.1:6379/0"
+Environment="PYTHONPATH=/var/www/html/self-service-app-encapsulated-v2"
+
+ExecStart=/opt/self-service-app-venv/bin/rq worker bib2holdings541 --url ${REDIS_URL} --path /var/www/html/self-service-app-encapsulated-v2
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

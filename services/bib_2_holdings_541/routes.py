@@ -63,8 +63,8 @@ def require_auth_or_reject():
     if "user" not in session:
         wants_json = "application/json" in (request.headers.get("Accept") or "")
         if wants_json:
-            return jsonify({"error": "Not authenticated"}), 401
-        return redirect(url_for("auth_bib_2_holdings_541.login", _scheme="https", _external=True))
+            return jsonify({"error": "Not authenticated", "login_url": url_for("auth_bib_2_holdings_541.login")}), 401
+        return redirect(url_for("auth_bib_2_holdings_541.login"))
 
     return None
 
@@ -96,30 +96,9 @@ def serve_component_template():
 @cross_origin(origins="*", headers=["Content-Type", "Authorization"])
 def upload_file():
 
-    print("UPLOAD_FILE ROUTE HIT", flush=True)
-    print("method =", request.method, flush=True)
-    print("form keys =", list(request.form.keys()), flush=True)
-    print("args =", dict(request.args), flush=True)
-    print("headers auth present =", bool(request.headers.get("Authorization")), flush=True)
-    # CORS preflight must succeed without auth headers
+    # Preflight requests do not carry authentication.
     if request.method == "OPTIONS":
         return ("", 204)
-    is_component = request.form.get('isComponent')
-    if is_component == 'false':
-        if 'user' not in session:
-            return redirect(url_for('barnes_and_noble_auth.login', _scheme="https", _external=True))
-
-    else:
-
-
-
-
-        # Verify token first
-        is_verified, message_or_userid = verify_token_or_reject()
-        if not is_verified:
-            return jsonify({"error": message_or_userid}), 401
-
-        #return redirect(url_for("main.error"))
     auth_response = require_auth_or_reject()
     if auth_response:
         return auth_response
@@ -168,7 +147,7 @@ def upload_file():
 @blueprint_541.route("/results/<path:filename>", methods=["GET"])
 def download_result(filename):
     if "user" not in session:
-        return redirect(url_for("auth_bib_2_holdings_541.login", _scheme="https", _external=True))
+        return redirect(url_for("auth_bib_2_holdings_541.login"))
     return send_from_directory(RESULTS_DIR, filename, as_attachment=True)
 
 

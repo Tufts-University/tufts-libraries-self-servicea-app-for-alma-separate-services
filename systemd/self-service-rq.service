@@ -1,0 +1,36 @@
+[Unit]
+Description=Self Service RQ Worker (bib2holdings541)
+After=network.target redis.service
+Wants=redis.service
+PartOf=self-service.service
+
+[Service]
+Type=simple
+User=libraryapps
+Group=libraryapps
+WorkingDirectory=/var/www/html/self-service-app
+EnvironmentFile=-/etc/sysconfig/self-service-app
+
+# ---- Queue wipe (ONLY your queue; does NOT affect other apps) ----
+# Default DB 0. If you use a different DB for your app, change -n.
+# Best practice if Redis is shared: use a dedicated DB number for this app.
+ExecStartPre=/usr/bin/redis-cli -n 0 DEL rq:queue:bib2holdings541
+ExecStartPre=/usr/bin/redis-cli -n 0 SREM rq:queues bib2holdings541
+
+# Start worker for that queue
+ExecStart=/opt/self-service-app-venv/bin/rq worker bib2holdings541
+
+Restart=always
+RestartSec=3
+
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+

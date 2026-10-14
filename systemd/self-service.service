@@ -1,0 +1,26 @@
+[Unit]
+Description=Gunicorn listener service
+EnvironmentFile=/etc/sysconfig/self-service-app
+
+
+[Service]
+User=libraryapps
+Group=libraryapps
+WorkingDirectory=/var/www/html/self-service-app
+
+# Run from WorkingDirectory, foreground (no --daemon)
+ExecStart=/opt/self-service-app-venv/bin/gunicorn -b 0.0.0.0:5000 run:app --timeout 900 -w 4
+
+
+# Stop anything bound to port 5002 on stop (optional)
+#ExecStop=fuser -k 5002/tcp
+ExecStop=kill $(sudo lsof -t -i:<port_number>)
+
+Restart=always
+RestartSec=3
+TimeoutStopSec=900
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
+

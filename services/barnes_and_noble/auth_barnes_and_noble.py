@@ -27,17 +27,17 @@ def login():
 
 
             session['user'] = username
-            return redirect(url_for('barnes_and_noble.index', _scheme="https", _external=True))
+            return redirect(url_for('barnes_and_noble.index'))
         else:
             flash('Invalid username or password', 'error')
-            return redirect(url_for('barnes_and_noble_auth.login', _scheme="https", _external=True))
+            return redirect(url_for('barnes_and_noble_auth.login'))
 
     return render_template('login.html')
 
 @barnes_and_noble_auth_blueprint.route('/logout')
 def logout():
     session.pop('user', None)
-    return redirect(url_for('barnes_and_noble_auth.login', _scheme="https", _external=True))
+    return redirect(url_for('barnes_and_noble_auth.login'))
 
 
 def login_required(f):
@@ -45,7 +45,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user' not in session:
-            return redirect(url_for('barnes_and_noble_auth.login', _scheme="https", _external=True))  # Redirect to the login page if not logged in
+            return redirect(url_for('barnes_and_noble_auth.login'))  # Redirect to the login page if not logged in
         return f(*args, **kwargs)
     return decorated_function
 

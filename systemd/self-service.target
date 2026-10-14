@@ -1,0 +1,7 @@
+[Unit]
+Description=Tufts Libraries Self Service Application Stack
+Wants=self-service-gateway.service self-service-main.service self-service-barnes-and-noble.service self-service-bib-541.service self-service-p-and-e.service self-service-gift-fund.service self-service-sql.service self-service-concurrent-checkouts.service self-service-film-search.service
+After=network.target
+
+[Install]
+WantedBy=multi-user.target

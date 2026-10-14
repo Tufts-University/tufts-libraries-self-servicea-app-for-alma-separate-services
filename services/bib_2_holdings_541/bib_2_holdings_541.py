@@ -19,7 +19,10 @@ from dotenv import load_dotenv
 # load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '..', '.env'))
 load_dotenv()
 
+from pathlib import Path
 
+ENV_PATH = Path(__file__).resolve().parents[2] / ".env"
+load_dotenv(dotenv_path=ENV_PATH)
 class Bib2Holdings541:
     """
     Flows:

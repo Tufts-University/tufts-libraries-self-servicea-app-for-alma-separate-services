@@ -1,3 +1,7 @@
 .venv
 **/.selenium
 **/.env
+.test-deps/
+.test-render/
+__pycache__/
+.pytest_cache/

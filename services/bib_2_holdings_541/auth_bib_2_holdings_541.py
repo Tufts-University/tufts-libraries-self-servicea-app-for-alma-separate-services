@@ -34,10 +34,10 @@ def login():
 
         if check_credentials(username, password):
             session["user"] = username
-            return redirect(url_for("bib_2_holdings_541.index", _scheme="https", _external=True))
+            return redirect(url_for("bib_2_holdings_541.index"))
 
         flash("Invalid username or password", "error")
-        return redirect(url_for("auth_bib_2_holdings_541.login", _scheme="https", _external=True))
+        return redirect(url_for("auth_bib_2_holdings_541.login"))
 
     return render_template("login.html")
 
@@ -45,7 +45,7 @@ def login():
 @bib_2_holdings_541_auth_blueprint.route("/logout")
 def logout():
     session.pop("user", None)
-    return redirect(url_for("auth_bib_2_holdings_541.login", _scheme="https", _external=True))
+    return redirect(url_for("auth_bib_2_holdings_541.login"))
 
 
 def login_required(f):
@@ -53,7 +53,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user" not in session:
-            return redirect(url_for("auth_bib_2_holdings_541.login", _scheme="https", _external=True))
+            return redirect(url_for("auth_bib_2_holdings_541.login"))
         return f(*args, **kwargs)
     return decorated_function
 

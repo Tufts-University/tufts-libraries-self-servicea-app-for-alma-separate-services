@@ -1,0 +1,102 @@
+﻿{% extends 'component_base.html' if is_component else 'base.html' %}
+{% block content %}
+{% if not is_component %}
+<h2>Bulk Create POL</h2>
+<p>Create one physical, one-time order per spreadsheet row or managed-set title.</p>
+<form id="bulk-create-pol-form" action="{{ url_for('bulk_create_pol.upload_file') }}" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="isComponent" value="false">
+  <p><label>Alma environment <select name="environment"><option value="sandbox">Sandbox</option><option value="prod">Production</option></select></label></p>
+  <p><label>Ingest method <select name="ingest_method" onchange="const f=this.form; const managed=this.value==='managed_set'; f.querySelector('[data-spreadsheet]').hidden=managed; f.querySelector('[data-managed]').hidden=!managed; f.elements.file.required=!managed; f.elements.set_id.required=managed;"><option value="spreadsheet">Spreadsheet</option><option value="managed_set">Managed set</option></select></label></p>
+  <div data-spreadsheet>
+    <p><label>Spreadsheet (CSV or XLSX) <input name="file" type="file" accept=".csv,.xlsx" required></label></p>
+    <p>Columns: MMS ID, Title (optional), Material Type, Library, Location, Item Policy, Vendor, Vendor Account, Price, Currency, Fund, Interested User (optional), 1st Reporting Code, 2nd Reporting Code (optional).</p>
+    <p>Format MMS IDs as text in Excel to preserve all digits. Nonblank spreadsheet columns override the defaults below. Each row must have its own price.</p>
+  </div>
+  <div data-managed hidden>
+    <p><label>Managed title set ID <input name="set_id" inputmode="numeric"></label></p>
+    <p><label>Per-item prices <input disabled placeholder="Per-item price entry: coming later"></label></p>
+    <p>Managed-set pricing is a placeholder. This submission produces a report of skipped records; no orders are posted without a price.</p>
+  </div>
+  <fieldset><legend>Values for this ingest (spreadsheet defaults or managed-set fields)</legend>
+    <p>Use your institution's Alma codes for libraries, locations, vendors, funds, material types, and item policies.</p>
+    <p><label>Material Type <input name="material_type" value="BOOK" list="material-types"></label><datalist id="material-types"><option value="BOOK">Book</option><option value="ZINE">Zine (use your configured code)</option></datalist></p>
+    <p><label>Library <input name="library"></label></p>
+    <p><label>Location <input name="location"></label></p>
+    <p><label>Item Policy <input name="item_policy" value="Default"></label></p>
+    <p><label>Vendor <input name="vendor"></label></p>
+    <p><label>Vendor Account <input name="vendor_account"></label></p>
+    <p><label>Currency <input name="currency" value="USD"></label></p>
+    <p><label>Fund <input name="fund"></label></p>
+    <p><label>Interested User (primary ID, optional) <input name="interested_user"></label></p>
+    <p><label>1st Reporting Code <input name="reporting_code" value="print"></label></p>
+    <p><label>2nd Reporting Code (optional) <input name="secondary_reporting_code"></label></p>
+  </fieldset>
+  <p><label>Email for results <input name="email" type="email" required></label></p>
+  <p><label><input type="checkbox" name="email_as_attachment" value="true"> Email the ZIP as an attachment</label></p>
+  <button type="submit">Submit background job</button>
+  <p role="status" id="bulk-create-pol-status"></p>
+</form>
+<script>
+document.getElementById('bulk-create-pol-form').addEventListener('submit', async function(event) {
+  event.preventDefault();
+  const button = this.querySelector('button[type=submit]');
+  const status = document.getElementById('bulk-create-pol-status');
+  button.disabled = true;
+  status.textContent = 'Submitting?';
+  try {
+    const response = await fetch(this.action, {method: 'POST', body: new FormData(this), headers: {'Accept': 'application/json'}});
+    const result = await response.json();
+    if (response.status === 401 && result.login_url) {
+      window.location.href = result.login_url;
+      return;
+    }
+    if (!response.ok) throw new Error(result.error || 'Submission failed');
+    status.textContent = 'Queued job ' + result.job_id + '. Results will be emailed on completion.';
+  } catch (error) {
+    status.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+</script>
+{% else %}
+<h2>Bulk Create POL</h2>
+<p>Create one physical, one-time order per spreadsheet row or managed-set title.</p>
+<template id="bulk-create-pol-template">
+<form id="bulk-create-pol-form" action="{{ url_for('bulk_create_pol.upload_file') }}" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="isComponent" value="{{ 'true' if is_component else 'false' }}">
+  <p><label>Alma environment <select name="environment"><option value="sandbox">Sandbox</option><option value="prod">Production</option></select></label></p>
+  <p><label>Ingest method <select name="ingest_method" onchange="const f=this.form; const managed=this.value==='managed_set'; f.querySelector('[data-spreadsheet]').hidden=managed; f.querySelector('[data-managed]').hidden=!managed; f.elements.file.required=!managed; f.elements.set_id.required=managed;"><option value="spreadsheet">Spreadsheet</option><option value="managed_set">Managed set</option></select></label></p>
+  <div data-spreadsheet>
+    <p><label>Spreadsheet (CSV or XLSX) <input name="file" type="file" accept=".csv,.xlsx" required></label></p>
+    <p>Columns: MMS ID, Title (optional), Material Type, Library, Location, Item Policy, Vendor, Vendor Account, Price, Currency, Fund, Interested User (optional), 1st Reporting Code, 2nd Reporting Code (optional).</p>
+    <p>Format MMS IDs as text in Excel to preserve all digits. Nonblank spreadsheet columns override the defaults below. Each row must have its own price.</p>
+  </div>
+  <div data-managed hidden>
+    <p><label>Managed title set ID <input name="set_id" inputmode="numeric"></label></p>
+    <p><label>Per-item prices <input disabled placeholder="Per-item price entry: coming later"></label></p>
+    <p>Managed-set pricing is a placeholder. This submission produces a report of skipped records; no orders are posted without a price.</p>
+  </div>
+  <fieldset><legend>Values for this ingest (spreadsheet defaults or managed-set fields)</legend>
+    <p>Use your institution's Alma codes for libraries, locations, vendors, funds, material types, and item policies.</p>
+    <p><label>Material Type <input name="material_type" value="BOOK" list="material-types"></label><datalist id="material-types"><option value="BOOK">Book</option><option value="ZINE">Zine (use your configured code)</option></datalist></p>
+    <p><label>Library <input name="library"></label></p>
+    <p><label>Location <input name="location"></label></p>
+    <p><label>Item Policy <input name="item_policy" value="Default"></label></p>
+    <p><label>Vendor <input name="vendor"></label></p>
+    <p><label>Vendor Account <input name="vendor_account"></label></p>
+    <p><label>Currency <input name="currency" value="USD"></label></p>
+    <p><label>Fund <input name="fund"></label></p>
+    <p><label>Interested User (primary ID, optional) <input name="interested_user"></label></p>
+    <p><label>1st Reporting Code <input name="reporting_code" value="print"></label></p>
+    <p><label>2nd Reporting Code (optional) <input name="secondary_reporting_code"></label></p>
+  </fieldset>
+  <p><label>Email for results <input name="email" type="email" required></label></p>
+  <p><label><input type="checkbox" name="email_as_attachment" value="true"> Email the ZIP as an attachment</label></p>
+  <button type="submit">Submit background job</button>
+  <p role="status" id="bulk-create-pol-status"></p>
+</form>
+</template>
+
+{% endif %}
+{% endblock %}

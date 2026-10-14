@@ -8,13 +8,14 @@ class ServiceRoute:
 
 SERVICES = (
     ServiceRoute("main", 5010, ("/", "/help")),
-    ServiceRoute("barnes_and_noble", 5011, ("/barnes_and_noble",)),
-    ServiceRoute("bib_2_holdings_541", 5012, ("/bib_2_holdings_541",)),
+    ServiceRoute("barnes_and_noble", 5011, ("/barnes_and_noble", "/barnes_and_noble_auth")),
+    ServiceRoute("bib_2_holdings_541", 5012, ("/bib_2_holdings_541", "/auth_bib_2_holdings_541")),
     ServiceRoute("p_and_e_rollup_match", 5013, ("/p_and_e", "/p_and_e_rollup_match")),
-    ServiceRoute("gift_fund_bibliography", 5014, ("/gift_fund_bibliography",)),
+    ServiceRoute("gift_fund_bibliography", 5014, ("/gift_fund_bibliography", "/auth_gift_fund_bibliography")),
     ServiceRoute("combine_analytics_subjects_areas", 5015, ("/combine_analytics_subjects_areas", "/sql")),
     ServiceRoute("concurrent_checkouts", 5016, ("/concurrent_checkouts",)),
     ServiceRoute("film_search", 5017, ("/film_search",)),
+    ServiceRoute("bulk_create_pol", 5018, ("/bulk_create_pol", "/auth_bulk_create_pol")),
 )
 
 

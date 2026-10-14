@@ -26,10 +26,11 @@ from services.p_and_e_rollup_match.p_and_e_rollup_match import ResourceMatch
 @p_and_e_blueprint.route('/component.js')
 @cross_origin()
 def serve_component():
-
-    component_path = os.path.join(current_app.root_path, 'p_and_e_rollup_match')
-    return send_from_directory(component_path, 'component.js', mimetype='application/javascript')
-# Serve component-template
+    return send_from_directory(
+        os.path.dirname(os.path.abspath(__file__)),
+        'component.js',
+        mimetype='application/javascript',
+    )# Serve component-template
 @p_and_e_blueprint.route('/component-template')
 @cross_origin()
 

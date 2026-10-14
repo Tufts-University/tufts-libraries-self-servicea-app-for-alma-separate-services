@@ -183,22 +183,22 @@ def run_bib2holdings541_job(job_id: str, input_path: str, email: str, email_as_a
         with open(out_path, "wb") as out:
             out.write(zip_bytes)
 
-        if email_as_attachment:
-            _send_email(
-                to_addr=email,
-                subject="Bib 2 Holdings 541: job complete",
-                body="Your Bib 2 Holdings 541 job has completed. Results are attached.",
-                attachment_bytes=zip_bytes,
-                attachment_name="rollup_files.zip"
-            )
-        else:
-            # you’ll expose a download route for this path (next section)
-            link = f"{PUBLIC_BASE_URL}/bib_2_holdings_541/results/{out_name}" if PUBLIC_BASE_URL else out_name
-            _send_email(
-                to_addr=email,
-                subject="Bib 2 Holdings 541: job complete",
-                body=f"Your Bib 2 Holdings 541 job has completed.\n\nDownload: {link}\n"
-            )
+
+        _send_email(
+            to_addr=email,
+            subject="Bib 2 Holdings 541: job complete",
+            body="Your Bib 2 Holdings 541 job has completed. Results are attached.",
+            attachment_bytes=zip_bytes,
+            attachment_name="rollup_files.zip"
+        )
+        # else:
+        #     # you’ll expose a download route for this path (next section)
+        #     link = f"{PUBLIC_BASE_URL}/bib_2_holdings_541/results/{out_name}" if PUBLIC_BASE_URL else out_name
+        #     _send_email(
+        #         to_addr=email,
+        #         subject="Bib 2 Holdings 541: job complete",
+        #         body=f"Your Bib 2 Holdings 541 job has completed.\n\nDownload: {link}\n"
+        #     )
 
     except Exception as e:
         _send_email(

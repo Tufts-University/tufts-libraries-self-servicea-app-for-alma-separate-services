@@ -11,7 +11,6 @@ from flask import (
     session
 )
 from services.gift_fund_bibliography.gift_fund_bibliography import GiftFundBibliography
-from services.gift_fund_bibliography.auth_gift_fund_bibliography import login_required
 from services.gift_fund_bibliography.auth_gift_fund_bibliography import verify_token_or_reject
 from flask_cors import CORS, cross_origin
 gift_fund_blueprint = Blueprint(
@@ -20,6 +19,21 @@ gift_fund_blueprint = Blueprint(
 
 import os
 from flask_cors import CORS, cross_origin
+def is_component_request():
+    values = (request.form.get("isComponent"), request.args.get("isComponent"))
+    return any((value or "").strip().lower() in ("true", "1", "yes", "y", "on") for value in values)
+
+
+def require_auth_or_reject():
+    if is_component_request():
+        ok, message = verify_token_or_reject()
+        if not ok:
+            return jsonify({"error": message}), 401
+    elif "user" not in session:
+        return redirect(url_for("blueprint_auth_gift_fund_bibliography.login"))
+    return None
+
+
 # Serve component.js
 @gift_fund_blueprint.route('/component.js')
 @cross_origin()
@@ -38,27 +52,21 @@ def serve_component_template():
 
 
 @gift_fund_blueprint.route("/", methods=["GET"])
-@login_required
 def index():
-    return render_template("gift_fund_bibliography.html")
+    auth_response = require_auth_or_reject()
+    if auth_response is not None:
+        return auth_response
+    return render_template("gift_fund_bibliography.html", is_component=is_component_request())
 
 
 @gift_fund_blueprint.route("/process", methods=["POST"])
 @cross_origin()
 def process():
-    is_component = request.form.get('isComponent')
-    if is_component == 'false':
-        if 'user' not in session:
-            return redirect(url_for('auth_gift_fund_bibliography.login', _scheme="https", _external=True))
-
-    else:
-        
-    
-
-        # Verify token first
-        is_verified, message_or_userid = verify_token_or_reject()
-        if not is_verified:
-            return jsonify({"error": message_or_userid}), 401
+    if request.method == "OPTIONS":
+        return ("", 204)
+    auth_response = require_auth_or_reject()
+    if auth_response is not None:
+        return auth_response
 
     library = request.form.get("library")
     fiscal_year = request.form.get("fiscal_year")
